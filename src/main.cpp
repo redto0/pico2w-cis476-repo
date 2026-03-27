@@ -2,9 +2,8 @@
 #include <pico/util/queue.h>
 #include <WiFi.h>
 
-// ---------------------------------------------------------
-// 1. DATA STRUCTURE & QUEUE SETUP
-// ---------------------------------------------------------
+
+//  DATA STRUCTURE & QUEUE SETUP
 // Define the shape of the data you want to pass between cores
 typedef struct {
   int sensorValue;
@@ -14,16 +13,15 @@ typedef struct {
 // Create the global queue so both cores can access it
 queue_t coreQueue;
 
-// ---------------------------------------------------------
-// 2. WI-FI CONFIGURATION (Easy to swap!)
-// ---------------------------------------------------------
-// i dont think having this in the main file is the startest way to do this tbh though.
-const char* WIFI_SSID = "YOUR_WIFI_SSID";
-const char* WIFI_PASS = "YOUR_WIFI_PASSWORD";
 
-// =========================================================
+//  WI-FI CONFIGURATION (Easy to swap!)
+// i dont think having this in the main file is the startest way to do this tbh though.
+const char* WIFI_SSID = "YOUR_WIFI_SSID"; // AsusLAN
+const char* WIFI_PASS = "YOUR_WIFI_PASSWORD"; // ISCISCLAN6
+
+
 // CORE 0: Handles Wi-Fi and Network Sockets
-// =========================================================
+
 void setup() {
   Serial.begin(115200);
   delay(2000); // Give serial monitor a moment to connect
@@ -57,7 +55,7 @@ void loop() {
     Serial.print(" | Time: ");
     Serial.println(incomingMsg.timestamp);
     
-    // --> SOCKET PROGRAMMING GOES HERE <--
+    // SOCKET PROGRAMMING GOES HERE 
     // You would take 'incomingMsg' and push it over your TCP/UDP socket.
   }
   
@@ -65,21 +63,21 @@ void loop() {
   // e.g., checking for incoming socket clients
 }
 
-// =========================================================
+
 // CORE 1: Handles Hardware, Sensors, and Heavy Math
-// =========================================================
+
 void setup1() {
   // Setup hardware for Core 1 (e.g., I2C sensors, SPI devices)
   // Note: setup1() runs automatically alongside setup()
 }
 
 void loop1() {
-  // 1. Generate or read data
+  //  Generate or read data
   CoreMessage newMsg;
   newMsg.sensorValue = random(0, 1024); // Simulating reading an ADC or Sensor
   newMsg.timestamp = millis();
 
-  // 2. Push data to the queue (non-blocking!)
+  //  Push data to the queue (non-blocking!)
   if (queue_try_add(&coreQueue, &newMsg)) {
     // Data successfully sent to Core 0
   } else {
